@@ -1,5 +1,7 @@
 # Il2CppDumper
 
+FORK of Il2CppDumper supporting deobfuscating Genshin's assemblies given nameTranslation.txt file is provided
+
 [![Build status](https://ci.appveyor.com/api/projects/status/anhqw33vcpmp8ofa?svg=true)](https://ci.appveyor.com/project/Perfare/il2cppdumper/branch/master/artifacts)
 
 中文说明请戳[这里](README.zh-CN.md)
