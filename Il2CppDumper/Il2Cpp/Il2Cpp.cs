@@ -26,10 +26,11 @@ namespace Il2CppDumper
         public Dictionary<int, List<Il2CppMethodSpec>> methodDefinitionMethodSpecs = new Dictionary<int, List<Il2CppMethodSpec>>();
         public Dictionary<Il2CppMethodSpec, ulong> methodSpecGenericMethodPointers = new Dictionary<Il2CppMethodSpec, ulong>();
         private bool fieldOffsetsArePointers;
-        protected long maxMetadataUsages;
+        protected long metadataUsagesCount;
         public Dictionary<string, Il2CppCodeGenModule> codeGenModules;
         public Dictionary<string, ulong[]> codeGenModuleMethodPointers;
         public Dictionary<string, Dictionary<uint, Il2CppRGCTXDefinition[]>> rgctxsDictionary;
+        public bool IsDumped;
 
         public abstract ulong MapVATR(ulong addr);
         public abstract ulong MapRTVA(ulong addr);
@@ -37,13 +38,14 @@ namespace Il2CppDumper
         public abstract bool PlusSearch(int methodCount, int typeDefinitionsCount, int imageCount);
         public abstract bool SymbolSearch();
         public abstract SectionHelper GetSectionHelper(int methodCount, int typeDefinitionsCount, int imageCount);
+        public abstract bool CheckDump();
 
         protected Il2Cpp(Stream stream) : base(stream) { }
 
-        public void SetProperties(double version, long maxMetadataUsages)
+        public void SetProperties(double version, long metadataUsagesCount)
         {
             Version = version;
-            this.maxMetadataUsages = maxMetadataUsages;
+            this.metadataUsagesCount = metadataUsagesCount;
         }
 
         protected bool AutoPlusInit(ulong codeRegistration, ulong metadataRegistration)
@@ -141,7 +143,7 @@ namespace Il2CppDumper
             }
             if (Version > 16 && Version < 27)
             {
-                metadataUsages = MapVATR<ulong>(pMetadataRegistration.metadataUsages, maxMetadataUsages);
+                metadataUsages = MapVATR<ulong>(pMetadataRegistration.metadataUsages, metadataUsagesCount);
             }
             if (Version >= 22)
             {
@@ -171,7 +173,7 @@ namespace Il2CppDumper
             for (var i = 0; i < pMetadataRegistration.typesCount; ++i)
             {
                 types[i] = MapVATR<Il2CppType>(pTypes[i]);
-                types[i].Init();
+                types[i].Init(Version);
                 typeDic.Add(pTypes[i], types[i]);
             }
             if (Version >= 24.2)
