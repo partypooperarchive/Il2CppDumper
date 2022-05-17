@@ -215,6 +215,17 @@ namespace Il2CppDumper
                 }
                 if (!flag)
                 {
+                    ulong codeRegistration = 0, metadataRegistration = 0;
+                    flag = KhangSearch.SearchRegistrations(il2cppPath, out codeRegistration, out metadataRegistration);
+                    if (flag)
+                    {
+                      Console.WriteLine("KhangSearch succeeded, buy him a beer!");
+                      il2Cpp.Init(codeRegistration, metadataRegistration);
+                      return true;
+                    }
+                }
+                if (!flag)
+                {
                     Console.WriteLine("ERROR: Can't use auto mode to process file, try manual mode.");
                     Console.Write("Input CodeRegistration: ");
                     var codeRegistration = Convert.ToUInt64(Console.ReadLine(), 16);
