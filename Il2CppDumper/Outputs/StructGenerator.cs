@@ -343,7 +343,7 @@ namespace Il2CppDumper
             {
                 foreach (var i in metadata.metadataUsageDic[Il2CppMetadataUsage.kIl2CppMetadataUsageTypeInfo])
                 {
-                    AddMetadataUsageTypeInfo(json, i.Value, il2Cpp.metadataUsages[i.Key]);
+                    AddMetadataUsageTypeInfo(json, i.Value, i.Key);
                 }
                 foreach (var i in metadata.metadataUsageDic[Il2CppMetadataUsage.kIl2CppMetadataUsageIl2CppType])
                 {
@@ -351,19 +351,19 @@ namespace Il2CppDumper
                 }
                 foreach (var i in metadata.metadataUsageDic[Il2CppMetadataUsage.kIl2CppMetadataUsageMethodDef])
                 {
-                    AddMetadataUsageMethodDef(json, i.Value, il2Cpp.metadataUsages[i.Key]);
+                    AddMetadataUsageMethodDef(json, i.Value, i.Key);
                 }
                 foreach (var i in metadata.metadataUsageDic[Il2CppMetadataUsage.kIl2CppMetadataUsageFieldInfo])
                 {
-                    AddMetadataUsageFieldInfo(json, i.Value, il2Cpp.metadataUsages[i.Key]);
+                    AddMetadataUsageFieldInfo(json, i.Value, i.Key);
                 }
                 foreach (var i in metadata.metadataUsageDic[Il2CppMetadataUsage.kIl2CppMetadataUsageStringLiteral])
                 {
-                    AddMetadataUsageStringLiteral(json, i.Value, il2Cpp.metadataUsages[i.Key]);
+                    AddMetadataUsageStringLiteral(json, i.Value, i.Key);
                 }
                 foreach (var i in metadata.metadataUsageDic[Il2CppMetadataUsage.kIl2CppMetadataUsageMethodRef])
                 {
-                    AddMetadataUsageMethodRef(json, i.Value, il2Cpp.metadataUsages[i.Key]);
+                    AddMetadataUsageMethodRef(json, i.Value, i.Key);
                 }
             }
             //输出单独的StringLiteral
@@ -434,7 +434,7 @@ namespace Il2CppDumper
             var typeName = executor.GetTypeName(type, true, false);
             var scriptMetadata = new ScriptMetadata();
             json.ScriptMetadata.Add(scriptMetadata);
-            scriptMetadata.Address = il2Cpp.GetRVA(address);
+            scriptMetadata.Address = il2Cpp.GetRVA(il2Cpp.MapTypeInfoUsage(address));
             scriptMetadata.Name = typeName + "_TypeInfo";
             var signature = GetIl2CppStructName(type);
             if (signature.EndsWith("_array"))
@@ -466,7 +466,7 @@ namespace Il2CppDumper
             var methodName = typeName + "." + metadata.GetStringFromIndex(methodDef.nameIndex) + "()";
             var scriptMetadataMethod = new ScriptMetadataMethod();
             json.ScriptMetadataMethod.Add(scriptMetadataMethod);
-            scriptMetadataMethod.Address = il2Cpp.GetRVA(address);
+            scriptMetadataMethod.Address = il2Cpp.GetRVA(il2Cpp.MapMethodDefRefUsage(address));
             scriptMetadataMethod.Name = "Method$" + methodName;
             var imageName = typeDefImageNames[typeDef];
             var methodPointer = il2Cpp.GetMethodPointer(imageName, methodDef);
@@ -485,7 +485,7 @@ namespace Il2CppDumper
             var fieldName = executor.GetTypeName(type, true, false) + "." + metadata.GetStringFromIndex(fieldDef.nameIndex);
             var scriptMetadata = new ScriptMetadata();
             json.ScriptMetadata.Add(scriptMetadata);
-            scriptMetadata.Address = il2Cpp.GetRVA(address);
+            scriptMetadata.Address = il2Cpp.GetRVA(il2Cpp.MapFieldInfoUsage(address));
             scriptMetadata.Name = "Field$" + fieldName;
         }
 
@@ -493,7 +493,7 @@ namespace Il2CppDumper
         {
             var scriptString = new ScriptString();
             json.ScriptString.Add(scriptString);
-            scriptString.Address = il2Cpp.GetRVA(address);
+            scriptString.Address = il2Cpp.GetRVA(il2Cpp.MapStringLiteralUsage(address));
             scriptString.Value = metadata.GetStringLiteralFromIndex(index);
         }
 
@@ -502,7 +502,7 @@ namespace Il2CppDumper
             var methodSpec = il2Cpp.methodSpecs[index];
             var scriptMetadataMethod = new ScriptMetadataMethod();
             json.ScriptMetadataMethod.Add(scriptMetadataMethod);
-            scriptMetadataMethod.Address = il2Cpp.GetRVA(address);
+            scriptMetadataMethod.Address = il2Cpp.GetRVA(il2Cpp.MapMethodDefRefUsage(address));
             (var methodSpecTypeName, var methodSpecMethodName) = executor.GetMethodSpecName(methodSpec, true);
             scriptMetadataMethod.Name = "Method$" + methodSpecTypeName + "." + methodSpecMethodName + "()";
             if (il2Cpp.methodSpecGenericMethodPointers.ContainsKey(methodSpec))
@@ -510,7 +510,7 @@ namespace Il2CppDumper
                 var genericMethodPointer = il2Cpp.methodSpecGenericMethodPointers[methodSpec];
                 if (genericMethodPointer > 0)
                 {
-                    scriptMetadataMethod.MethodAddress = il2Cpp.GetRVA(genericMethodPointer);
+                    scriptMetadataMethod.MethodAddress = il2Cpp.GetRVA(il2Cpp.MapMethodDefRefUsage(genericMethodPointer, false));
                 }
             }
         }

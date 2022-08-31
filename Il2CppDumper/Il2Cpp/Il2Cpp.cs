@@ -9,6 +9,7 @@ namespace Il2CppDumper
     {
         private Il2CppMetadataRegistration pMetadataRegistration;
         private Il2CppCodeRegistration pCodeRegistration;
+        private Il2CppUsagesRegistration pUsagesRegistration;
         public ulong[] methodPointers;
         public ulong[] genericMethodPointers;
         public ulong[] invokerPointers;
@@ -48,7 +49,7 @@ namespace Il2CppDumper
             this.metadataUsagesCount = metadataUsagesCount;
         }
 
-        protected bool AutoPlusInit(ulong codeRegistration, ulong metadataRegistration)
+        protected bool AutoPlusInit(ulong codeRegistration, ulong metadataRegistration, ulong usagesRegistration = 0)
         {
             if (codeRegistration != 0)
             {
@@ -87,15 +88,16 @@ namespace Il2CppDumper
             }
             Console.WriteLine("CodeRegistration : {0:x}", codeRegistration);
             Console.WriteLine("MetadataRegistration : {0:x}", metadataRegistration);
+            Console.WriteLine("UsagesRegistration : {0:x}", usagesRegistration);
             if (codeRegistration != 0 && metadataRegistration != 0)
             {
-                Init(codeRegistration, metadataRegistration);
+                Init(codeRegistration, metadataRegistration, usagesRegistration);
                 return true;
             }
             return false;
         }
 
-        public virtual void Init(ulong codeRegistration, ulong metadataRegistration)
+        public virtual void Init(ulong codeRegistration, ulong metadataRegistration, ulong usagesRegistration = 0)
         {
             pCodeRegistration = MapVATR<Il2CppCodeRegistration>(codeRegistration);
             if (Version == 27 && pCodeRegistration.invokerPointersCount > 0x50000) //TODO
@@ -231,6 +233,9 @@ namespace Il2CppDumper
                 list.Add(methodSpec);
                 methodSpecGenericMethodPointers.Add(methodSpec, genericMethodPointers[table.indices.methodIndex]);
             }
+
+            if (usagesRegistration != 0)
+                pUsagesRegistration = MapVATR<Il2CppUsagesRegistration>(usagesRegistration);
         }
 
         public T MapVATR<T>(ulong addr) where T : new()
@@ -315,6 +320,34 @@ namespace Il2CppDumper
         public virtual ulong GetRVA(ulong pointer)
         {
             return pointer;
+        }
+
+        protected ulong MapUsage(ulong? bas, ulong offset, bool is_index = true)
+        {
+            if (bas == null)
+                return is_index ? metadataUsages[offset] : offset;
+
+            return bas.GetValueOrDefault() + offset * 8;
+        }
+
+        public ulong MapTypeInfoUsage(ulong address)
+        {
+            return MapUsage(pUsagesRegistration?.typeInfoUsage, address);
+        }
+
+        public ulong MapMethodDefRefUsage(ulong address, bool is_index = true)
+        {
+            return MapUsage(pUsagesRegistration?.methodDefRefUsage, address, is_index);
+        }
+
+        public ulong MapFieldInfoUsage(ulong address)
+        {
+            return MapUsage(pUsagesRegistration?.fieldInfoUsage, address);
+        }
+
+        public ulong MapStringLiteralUsage(ulong address)
+        {
+            return MapUsage(pUsagesRegistration?.stringLiteralUsage, address);
         }
     }
 }

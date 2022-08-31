@@ -231,12 +231,12 @@ namespace Il2CppDumper
                 }
                 if (!flag)
                 {
-                    ulong codeRegistration = 0, metadataRegistration = 0;
-                    flag = KhangSearch.SearchRegistrations(il2cppPath, out codeRegistration, out metadataRegistration);
+                    ulong codeRegistration = 0, metadataRegistration = 0, usagesRegistration = 0;
+                    flag = KhangSearch.SearchRegistrations(il2cppPath, 0x180000000, out codeRegistration, out metadataRegistration, out usagesRegistration);
                     if (flag)
                     {
                       Console.WriteLine("KhangSearch succeeded, buy him a beer!");
-                      il2Cpp.Init(codeRegistration, metadataRegistration);
+                      il2Cpp.Init(codeRegistration, metadataRegistration, usagesRegistration);
                       return true;
                     }
                 }
@@ -247,7 +247,9 @@ namespace Il2CppDumper
                     var codeRegistration = Convert.ToUInt64(Console.ReadLine(), 16);
                     Console.Write("Input MetadataRegistration: ");
                     var metadataRegistration = Convert.ToUInt64(Console.ReadLine(), 16);
-                    il2Cpp.Init(codeRegistration, metadataRegistration);
+                    Console.Write("Input UsagesRegistration: ");
+                    var usagesRegistration = Convert.ToUInt64(Console.ReadLine(), 16);
+                    il2Cpp.Init(codeRegistration, metadataRegistration, usagesRegistration);
                 }
                 if (il2Cpp.Version >= 27 && il2Cpp.IsDumped)
                 {

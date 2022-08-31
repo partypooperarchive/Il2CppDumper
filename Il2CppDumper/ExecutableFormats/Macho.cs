@@ -67,9 +67,9 @@ namespace Il2CppDumper
             }
         }
 
-        public override void Init(ulong codeRegistration, ulong metadataRegistration)
+        public override void Init(ulong codeRegistration, ulong metadataRegistration, ulong usagesRegistration = 0)
         {
-            base.Init(codeRegistration, metadataRegistration);
+            base.Init(codeRegistration, metadataRegistration, usagesRegistration);
             methodPointers = methodPointers.Select(x => x - 1).ToArray();
             customAttributeGenerators = customAttributeGenerators.Select(x => x - 1).ToArray();
         }
